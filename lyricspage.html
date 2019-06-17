@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<head>
+    <title>
+        slopify
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+</head>
+<body>
+    <style>
+    p, h1{
+        color: #e1f5fe
+    }
+    .fLeft{
+        position: float;
+        float: left;
+        margin: 0 10px 0 0;
+    } 
+    #mainToolbar{
+        position: absolute;
+        top: 0px;
+    }
+    </style>
+    <div id="mainToolbar">
+        <button class="fLeft waves-effect waves-light btn" id="update">Get Lyrics</button>
+        <button class="fLeft waves-effect waves-light btn" id="using">Using: </button>
+        <button class="fLeft waves-effect waves-light btn" id="updateUser">Change User</button>
+    </div>
+    <h1 id="cur">welcome to slopify</h1>
+    <p id="lyr">lyrics here</p>
+    <script>
+        const electron = require('electron');
+        const {ipcRenderer} = electron;
+        var url = require('url');
+        var path = require('path')
+        const BrowserWindow = electron.remote.BrowserWindow;
+        const form = document.querySelector("#update");
+        form.addEventListener("click",updateLyrics);
+        const updateUser = document.querySelector("#updateUser");
+        updateUser.addEventListener("click",updateUsername);
+        function updateUsername(){
+            console.log("test1");
+            let subWin = new BrowserWindow({  backgroundColor: '#212121', width: 300, height: 300, show:false, webPreferences:{
+                nodeIntegration: true
+            } });
+            subWin.on('closed', () => {
+                subWin = null;
+            });
+            subWin.loadURL(url.format({
+                pathname: path.join(__dirname,'changeuser.html'),
+                protocol: 'file:',
+                slashes: true
+            }))
+                subWin.on("ready-to-show",()=>{
+                subWin.show();
+            })
+
+        }
+        function updateLyrics(e){
+            console.log("update");
+            ipcRenderer.send('update:lyrics'); //catch this in the main...
+            ipcRenderer.send('update:track');
+        }
+        ipcRenderer.on("username",(e,item)=>{
+            const use = document.querySelector("#using")
+            use.innerHTML = "User: " + item
+        })
+        ipcRenderer.on("updated:lyrics",(e,item)=>{
+            const lyr = document.querySelector("#lyr");
+            item = item.replace(/\n/g, "<br />");
+            item = item.replace(/]/g,"]<br /><br />");
+            item = item.replace(/\[/g,"<br /><br />[");
+            lyr.innerHTML =item;  
+        })
+        ipcRenderer.on("cur:track",(e,item)=>{
+            const cur = document.querySelector("#cur");
+            cur.innerHTML = "adsfadsf";
+            cur.innerHTML = item["track"] + " by " + item["artist"];
+        })
+        
+        
+    </script>
+</body>
