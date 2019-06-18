@@ -27,7 +27,7 @@
         <button class="fLeft waves-effect waves-light btn" id="updateUser">Change User</button>
     </div>
     <h1 id="cur">welcome to slopify</h1>
-    <p id="lyr">lyrics here</p>
+    <p id="lyr">hit "get lyrics" above to get started</p>
     <script>
         const electron = require('electron');
         const {ipcRenderer} = electron;
@@ -58,7 +58,7 @@
         }
         function updateLyrics(e){
             console.log("update");
-            ipcRenderer.send('update:lyrics'); //catch this in the main...
+            //ipcRenderer.send('update:lyrics'); //catch this in the main...
             ipcRenderer.send('update:track');
         }
         ipcRenderer.on("username",(e,item)=>{

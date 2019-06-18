@@ -1,88 +1,17 @@
 console.log("helloworld!");
-//make http request to google
-//get first link to get genuis page.  
-//parse with jssoup
+
 var fs = require("fs");
 const https = require('https');
 let user = "lastpriest";
 let lyrics;
-//process.env.NODE_ENV = 'production';
-//first http request to google
-function queryGoogle(artistTrack){
-    track = artistTrack["track"].replace(' ','+')
-    artist = artistTrack["artist"].replace(' ','+')
-    query = "https://www.google.com/search?q=" + track + "+" + artist +  "+genius"
-    console.log(query)
-    https.get(query,(resp)=>{
-    let data = ''
-    resp.on("data",(chunk)=>{
-        data+= chunk;
-    })
-    resp.on("end",()=>{
-        console.log("done")
-        fs.writeFileSync("test.txt",data,(err)=>{
-            if(err){
-                console.log(err)
-            }else{
-                console.log("good")
-            }
-        })
-        //grabLink(data)
-        matchUrl = grabLinkStringMethods(data)
-        getLyricsFromGenius(matchUrl)
-    })
-    }).on("error",(err)=>{
-        console.log("error");
-    })
-}
-
-function getLyricsFromGenius(matchUrl){
-    https.get(matchUrl,(resp)=>{
-        let data="";
-        resp.on("data",(chunk)=>{
-            data+=chunk
-        })
-        resp.on("end",()=>{
-            //console.log(data)
-            fs.writeFileSync("genius.txt",data,(err)=>{
-                console.log("done");
-            })
-            var soup = new JSSoup(data)
-            lyrics = soup.findAll('p')
-            //console.log((lyrics[0].text))
-
-            //update page once u get it....
-        })   
-        //var soup = new JSSoup(resp)
-        //lyrics = soup.findAll('p')
-        //console.log(soup)
-    })
-}
 var JSSoup = require('jssoup').default
-function grabLinkStringMethods(data){
-    var match = data.match("https://genius.com/[^&;]+")[0];
-    console.log(match)
-    return match;
-}
-//use jsoup to get link.
-function grabLink(data){
-    var soup = new JSSoup(data)
-    var divs = soup.findAll('div',{"class":"r"})
-    let searchRes;  //clearly this doesnt get all divs.
-    divs.forEach((val)=>{
-        if(val.attrs['class']=="r"){
-            searchRes = val;
-        }
-    });
-    console.log(searchRes.attrs["class"])
-    var divSub = searchRes.find('div')
-    console.log(searchRes)
-    console.log("done^^")
-}
+
 const {app} = require('electron')
 const { BrowserWindow, ipcMain } = require('electron')
+var events = require('events');
 const url = require('url')
 const path = require('path')
+let interalEE = new events.EventEmitter();
 app.on("ready",()=>{
     let mainWin = new BrowserWindow({  backgroundColor: '#212121', width: 800, height: 600, show:false, webPreferences:{
         nodeIntegration: true
@@ -121,15 +50,76 @@ app.on("ready",()=>{
         mainWin.webContents.send("username",user);
     })
 
+
 })
-function updateTrack(mainWin){
-    https.get("https://www.last.fm/user/" + user,(resp)=>{
+
+function queryGoogle(artistTrack,mainWin){
+    track = artistTrack["track"].replace(' ','+')
+    artist = artistTrack["artist"].replace(' ','+')
+    query = "https://www.google.com/search?q=" + track + "+" + artist +  "+genius"
+    console.log(query)
+    https.get(query,(resp)=>{
+    let data = ''
+    resp.on("data",(chunk)=>{
+        data+= chunk;
+    })
+    resp.on("end",()=>{
+        console.log("done")
+        matchUrl = grabLinkStringMethods(data)
+        getLyricsFromGenius(matchUrl,mainWin)
+    })
+    }).on("error",(err)=>{
+        console.log("error");
+    })
+}
+
+function getLyricsFromGenius(matchUrl,mainWin){
+    https.get(matchUrl,(resp)=>{
         let data="";
         resp.on("data",(chunk)=>{
             data+=chunk
         })
         resp.on("end",()=>{
             //console.log(data)
+            var soup = new JSSoup(data)
+            lyrics = soup.findAll('p');
+            console.log("done");
+            console.log(lyrics[0].text);
+            mainWin.webContents.send("updated:lyrics",lyrics[0].text);
+        })   
+    })
+}
+function grabLinkStringMethods(data){
+    var match = data.match("https://genius.com/[^&;]+")[0];
+    console.log(match)
+    return match;
+}
+//use jsoup to get link.
+function grabLink(data){
+    var soup = new JSSoup(data)
+    var divs = soup.findAll('div',{"class":"r"})
+    let searchRes;  //clearly this doesnt get all divs.
+    divs.forEach((val)=>{
+        if(val.attrs['class']=="r"){
+            searchRes = val;
+        }
+    });
+    console.log(searchRes.attrs["class"])
+    var divSub = searchRes.find('div')
+    console.log(searchRes)
+    console.log("done^^")
+}
+
+function updateTrack(mainWin){
+    https.get("https://www.last.fm/user/" + user,(resp)=>{
+        console.log("https://www.last.fm/user/" + user);
+        let data="";
+        resp.on("data",(chunk)=>{
+            data+=chunk
+        })
+        resp.on("end",()=>{
+            //console.log(data)
+            console.log("done");
             trackName = data.match(/data-track-name=\"[^\"]+/ig)[2].substring(17);
             console.log(trackName)
             artistName = data.match(/data-artist-name=\"[^\"]+/ig)[2].substring(18);
@@ -139,7 +129,7 @@ function updateTrack(mainWin){
                 "artist":artistName,
                 "track":trackName
             }
-            queryGoogle(curTrack)
+            queryGoogle(curTrack,mainWin)
             mainWin.webContents.send("cur:track",curTrack)
             //console.log((lyrics[0].text))
 
