@@ -5,6 +5,6 @@ cross platform and written in node.js
 ![Alt text](img.jpg?raw=true "Screenshot")
 
 ## Downloads
-mac:<br/>
-windows:<br/>
+mac: <br/>
+windows: [download](https://github.com/jackBonadies/lastlyrics/raw/master/release-builds/electron-tutorial-app-win32-ia32/electron-tutorial-app.exe) <br/>
 linux: <br/>
