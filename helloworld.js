@@ -1,5 +1,5 @@
 const setupEvents = require('./installers/setupEvents')
-if(setupEvenbts.handleSquirrelEvent()){
+if(setupEvents.handleSquirrelEvent()){
     return;
 }
 var fs = require("fs");
@@ -15,9 +15,10 @@ const url = require('url')
 const path = require('path')
 let interalEE = new events.EventEmitter();
 app.on("ready",()=>{
-    let mainWin = new BrowserWindow({  backgroundColor: '#212121', width: 800, height: 600, show:false, webPreferences:{
+    let mainWin = new BrowserWindow({  backgroundColor: '#212121', width: 800, height: 600, show:false, titleBarStyle: "hidden", alwaysOnTop:true,webPreferences:{
         nodeIntegration: true
     } })
+    mainWin.removeMenu()
     mainWin.on('closed', () => {
         mainWin = null
     })
@@ -51,8 +52,13 @@ app.on("ready",()=>{
         user=newUser;
         mainWin.webContents.send("username",user);
     })
-
-
+    ipcMain.on("alwaysOnTopToggle",(e)=>{
+        if(mainWin.isAlwaysOnTop()){
+            mainWin.setAlwaysOnTop(false)
+        }else{
+            mainWin.setAlwaysOnTop(true)
+        }
+    })
 })
 
 function queryGoogle(artistTrack,mainWin){
