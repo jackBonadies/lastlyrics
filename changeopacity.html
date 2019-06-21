@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<head>
+    <title>
+        change opacity (between 0 and 1)
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+</head>
+<body>
+    <style>
+    p, h1,input{
+        color: #e1f5fe
+    }
+    .fLeft{
+        position: float;
+        float: left;
+    } 
+    #mainToolbar{
+        position: absolute;
+        top: 0px;
+    }
+    </style>
+    <div id="mainToolbar">
+        <input type="text" id="changeUser"></input>
+        <button type="submit" class="fLeft waves-effect waves-light btn" id="updateOp">Update Opacity</button>
+        <p id="error"></p>
+    </div>
+    <script>
+      const electron = require('electron');
+      const {ipcRenderer} = electron;
+      const updateOp = document.querySelector("#updateOp");
+      updateOp.addEventListener('click',submitOp);
+      function submitOp(e){
+          e.preventDefault();
+          const val = document.querySelector("#changeUser").value;
+          if(val<=1.0 && val>=0.0){
+            ipcRenderer.send("update:op",val);
+            close();
+          }else{
+            const errorSpace = document.querySelector("#error")
+            errorSpace.innerHTML = "<br><br>Please choose a value between 0.0 and 1.0 i.e. 0.75"
+          }
+          
+      }
+    
+    </script>
+</body>

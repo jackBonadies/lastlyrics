@@ -59,6 +59,13 @@ app.on("ready",()=>{
             mainWin.setAlwaysOnTop(true)
         }
     })
+    ipcMain.on("update:op",(e,val)=>{
+        mainWin.webContents.send("update:op",val)
+        var x = parseFloat(val)
+        console.log(x)
+        console.log(typeof x)
+        mainWin.setOpacity(x)
+    })
 })
 
 function queryGoogle(artistTrack,mainWin){

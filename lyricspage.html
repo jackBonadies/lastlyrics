@@ -27,6 +27,7 @@
         <button class="fLeft waves-effect waves-light btn" id="using">Using: </button>
         <button class="fLeft waves-effect waves-light btn" id="updateUser">Change User</button>
         <button class="fLeft waves-effect waves-light btn" id="onTop">Always on Top: True</button>
+        <button class="fLeft waves-effect waves-light btn" id="setOp">Set Opacity: 1.0</button>
     </div>
     <h1 id="cur">welcome to slopify</h1>
     <p id="lyr">hit "get lyrics" above to get started</p>
@@ -42,6 +43,21 @@
         updateUser.addEventListener("click",updateUsername);
         const onTop = document.querySelector("#onTop");
         onTop.addEventListener("click",topToggle)
+        const setOp = document.querySelector("#setOp")
+        setOp.addEventListener("click",setOpFn)
+        function setOpFn(){
+            console.log("clicky")
+            var opWin = new BrowserWindow({backgroundColor:'#212121',width: 300, height: 300, show:false, alwaysOnTop:true,webPreferences:{
+                nodeIntegration: true}
+            })
+            opWin.on('closed',()=>{opWin=null})
+            opWin.loadURL(url.format({
+                pathname: path.join(__dirname,"changeopacity.html"),
+                protocol: "file",
+                slashes: true
+            }))
+            opWin.on('ready-to-show',()=>{opWin.show()})
+        }
         function topToggle(){
             ipcRenderer.send("alwaysOnTopToggle")
             var prevString = onTop.innerHTML;
@@ -90,7 +106,10 @@
             cur.innerHTML = "adsfadsf";
             cur.innerHTML = item["track"] + " by " + item["artist"];
         })
-        
+        ipcRenderer.on("update:op",(e,val)=>{
+            const op = document.querySelector("#setOp")
+            op.innerHTML = "Set Opacity: " + val;
+        })
         
     </script>
 </body>
