@@ -4,5 +4,8 @@
 *.app filter=lfs diff=lfs merge=lfs -text
 release-builds/slopify-darwin-x64/** filter=lfs diff=lfs merge=lfs -text
 release-builds/slopify-darwin-x64/ filter=lfs diff=lfs merge=lfs -text
+<<<<<<< HEAD
 release-builds/ filter=lfs diff=lfs merge=lfs -text
 release-builds/** filter=lfs diff=lfs merge=lfs -text
+=======
+>>>>>>> fd65f040a6a56407b5551beee29f603901031f48
