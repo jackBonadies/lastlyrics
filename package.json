@@ -1,0 +1,25 @@
+{
+  "name": "slopify",
+  "productName": "slopify",
+  "version": "1.0.0",
+  "description": "lyrics application",
+  "main": "helloworld.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . slopify --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"slopify\"",
+    "package-linux": "electron-packager . slopify --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds"
+  },
+  "author": "jack bonadies",
+  "license": "MIT",
+  "dependencies": {
+    "@material-ui/core": "^4.0.0-rc.0",
+    "jssoup": "0.0.10"
+  },
+  "devDependencies": {
+    "electron": "^5.0.4",
+    "electron-packager": "^13.1.1",
+    "electron-winstaller": "^3.0.4"
+  }
+}
